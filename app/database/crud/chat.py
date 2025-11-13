@@ -1,4 +1,4 @@
-from typing import cast
+from typing import cast, Optional
 from sqlalchemy import Column, DateTime, select
 from sqlalchemy.orm import selectinload
 import traceback
@@ -115,7 +115,6 @@ async def add_conversation(
     session_id: str,
     user_text: str,
     bot_text: str,
-    model_id: str,
     web_sources: list[WebSource],
     rag_sources: list[RagSource],
     params: GenerationParams,
@@ -133,8 +132,13 @@ async def add_conversation(
             session_id=session_id,
             role="user",
             text=user_text,
+<<<<<<< HEAD
             model_id=model_id,
             web_sources=[],   # user thường không có nguồn tham khảo
+=======
+            model_id=params["model_id"],
+            web_sources=[], #Maybe user can provide sources ?
+>>>>>>> origin/final
             rag_sources=[],
             params=params,
             timestamp=user_timestamp,
@@ -145,7 +149,7 @@ async def add_conversation(
             session_id=session_id,  
             role="bot",
             text=bot_text,
-            model_id=model_id,
+            model_id=params["model_id"],
             web_sources=web_sources,
             rag_sources=rag_sources,
             params=params,

@@ -1,5 +1,6 @@
-from typing import AsyncGenerator, Callable, Awaitable, TypedDict, Optional
+from datetime import datetime, timezone
 
+<<<<<<< HEAD
 from core.types import ModelInfo, GenerationParams, ModelPreOutput
 from config import GEMINI_MODEL, SYSTEM_INSTRUCTION
 
@@ -10,14 +11,19 @@ from .schema import APIJobInfo
 from .gemini import GeminiAPIModel
 from .utils import generate_id
 from .kaggle import KaggleManager
+=======
+from core import ModelInfo, GenerationParams, ModelPreOutput, ModelOutput, ChatMessage
+from database import add_conversation, get_session_with_messages
 
-class JobInfo(TypedDict):
-    finish_call: Callable[[str, list], Awaitable]  # Updated to accept web_sources
-    domain: str
-    id: str
-    server_kwargs: Optional[dict]
+from .worker import WorkerManager
+>>>>>>> origin/final
 
+import uuid
+
+def generate_id() -> str:
+    return str(uuid.uuid4())
 class ModelManager:
+<<<<<<< HEAD
     _gemini_api = GeminiAPIModel()
     _jobs: dict[str, JobInfo] = {} # No timeout implemented yet
             
@@ -183,15 +189,52 @@ class ModelManager:
             web_sources, _ = KaggleManager.get_stored_sources(job_info_id)
             await job_info["finish_call"](total, web_sources)
             
+=======
+    """Stateless Manager class. Depend on `WorkerManager` whichs is statefull.""" 
+    @classmethod
+    async def pre_inference(cls, session_id: str, user_id: str, text: str, params: GenerationParams) -> ModelPreOutput | None:
+        """Auto select suitable worker according to model id and return `ModelPreOutput`. Return `None` when failed."""
+        # Performance can worry later
+        session = await get_session_with_messages(session_id)
+        if session is None: raise Exception("Unknown error while pre inference")
+        messages_history = session.messages[-params.get("max_history", 0):]
+        history: list[ChatMessage] = [
+            ChatMessage(
+                role=message.role, #type:ignore
+                text=message.text
+            ) for message in messages_history
+        ] 
+        result = await WorkerManager.pre_inference(
+            user_id=user_id,
+            session_id=session_id,
+            text=text,
+            history=history,
+            params=params   
+        )
+        return result
+>>>>>>> origin/final
     @classmethod
     async def get_models(cls) -> list[ModelInfo]:
-        result: list[ModelInfo] = [
-            {
-                "name": "Gemini (Server)",
-                "id": f"api:{GEMINI_MODEL}",
-                "streaming": False,
-                "source": "server"
-            }
-        ]
-        result.extend(await KaggleManager.get_models())
-        return result
+        return await WorkerManager.get_models()
+    @classmethod
+    async def store_chat(cls, user_id: str, session_id: str, user_text: str, user_timestamp: datetime | str, model_output: ModelOutput):
+        """
+        Update chat in database. Call in worker router only. \n
+        Should be used when worker finish inference on their server, then send request to this server to store in database.
+        """
+        if isinstance(user_timestamp, str):
+            user_timestamp = datetime.fromisoformat(user_timestamp)
+        bot_timestamp = datetime.now(timezone.utc)
+        user_msg_id, bot_msg_id = await add_conversation(
+            user_id=user_id,
+            session_id=session_id,
+            user_text=user_text,
+            bot_text=model_output["text"],
+            web_sources=model_output["web_sources"],
+            rag_sources=model_output["rag_sources"],
+            params=model_output["generation_params"],
+            user_timestamp=user_timestamp,
+            bot_timestamp=bot_timestamp, # Does not prevent incorrect order
+            user_extra_data={},
+            bot_extra_data=model_output["extra_data"]
+        )

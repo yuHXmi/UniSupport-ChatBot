@@ -11,22 +11,25 @@ from core.types import GenerationParams, ChatMessageRole, RagSource, WebSource
 
 class ChatRequest(BaseModel):
     text: str
-    model_id: str
     session_id: Optional[str]
     params: GenerationParams
     
 class PreChatResponse(TypedDict):
+<<<<<<< HEAD
     stream_id: str
+=======
+>>>>>>> origin/final
     session_id: str
     role: ChatMessageRole
     rag_sources: list[RagSource]
     web_sources: list[WebSource]
     extra_data: dict
+    result_url: str
     
 class MessageResponse(TypedDict):
     id: str
     text: str
-    model_id: Optional[str]
+    model_id: str
     session_id: str
     role: ChatMessageRole
     timestamp: datetime

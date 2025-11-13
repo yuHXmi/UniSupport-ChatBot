@@ -57,7 +57,11 @@ class ChatSession(Base): #type:ignore
         msg_count = int(getattr(self, "msg_count"))
         return {
             "id": self.id,
+<<<<<<< HEAD
             "title": self.title or preview, # fallback cho DB cũ chưa có title
+=======
+            "title": self.title or preview, # It would need preview when used with old db, as new setup prevent this
+>>>>>>> origin/final
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "message_count": msg_count,
