@@ -126,6 +126,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="control-group" title="Bật: multi-hop tự chọn nguồn (DB / web / hybrid) cho từng sub-q. Tắt: mọi sub-q chạy theo 2 toggle Tìm kiếm trên mạng & CSDL ở trên.">
+                                <label for="auto-source-checkbox" class="control-label">Tự chọn nguồn dữ liệu:</label>
+                                <div class="control-input">
+                                    <div class="slider-container">
+                                        <div class="slider-switch">
+                                            <input type="checkbox" id="auto-source-checkbox" checked>
+                                            <span class="slider-track">
+                                                <span class="slider-thumb"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="control-group">
                                 <label for="priority-domains" class="control-label">Ưu tiên trang chính thức:</label>
                                 <div class="control-input">
@@ -158,6 +171,32 @@
                                     <div class="slider-container">
                                         <div class="slider-switch">
                                             <input type="checkbox" id="llm-rerank-checkbox">
+                                            <span class="slider-track">
+                                                <span class="slider-thumb"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group" title="Bật: lọc URL sau web search/page rerank và trước khi crawl. Tắt: crawl theo kết quả tìm kiếm/rerank.">
+                                <label for="quality-gate-checkbox" class="control-label">QualityGate trước crawl:</label>
+                                <div class="control-input">
+                                    <div class="slider-container">
+                                        <div class="slider-switch">
+                                            <input type="checkbox" id="quality-gate-checkbox" checked>
+                                            <span class="slider-track">
+                                                <span class="slider-thumb"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group" title="Bật: lọc nguồn và chunk sau crawl, extract, chunking/rerank trước khi đưa vào ngữ cảnh RAG.">
+                                <label for="chunk-gate-checkbox" class="control-label">ChunkGate sau chunking:</label>
+                                <div class="control-input">
+                                    <div class="slider-container">
+                                        <div class="slider-switch">
+                                            <input type="checkbox" id="chunk-gate-checkbox" checked>
                                             <span class="slider-track">
                                                 <span class="slider-thumb"></span>
                                             </span>

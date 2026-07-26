@@ -16,6 +16,13 @@ class GenerationParams(TypedDict):
     # Search
     use_websearch: NotRequired[bool]
     use_localdb: NotRequired[bool]
+    # Source policy for retrieval:
+    # - auto: multi-hop decomposer chooses local_db / web / hybrid per sub-question.
+    # - local/web/hybrid: force every retrieval sub-question to the selected source mode.
+    source_mode: NotRequired[Literal["auto", "local", "web", "hybrid"]]
+    # Backward-compatible flag. True maps to source_mode=auto; False derives mode
+    # from use_websearch/use_localdb when source_mode is not provided.
+    auto_source: NotRequired[bool]
     max_query: NotRequired[int]
     query_score_threshold: NotRequired[float]
     engine_type: NotRequired[SearchEngineType] # google/brave
@@ -39,6 +46,20 @@ class GenerationParams(TypedDict):
     include_image: NotRequired[bool]
     merge_table: NotRequired[bool]
     merge_neighbor: NotRequired[bool]
+    # Retrieval gates: QualityGate runs before crawl, ChunkGate runs after chunking.
+    enable_quality_gate: NotRequired[bool]
+    enable_pre_crawl_quality_gate: NotRequired[bool]
+    enable_chunk_gate: NotRequired[bool]
+    quality_log: NotRequired[bool]
+    test_trace: NotRequired[bool]
+    quality_min_score: NotRequired[float]
+    quality_min_relevance: NotRequired[float]
+    quality_min_trust: NotRequired[float]
+    quality_semantic_weight: NotRequired[float]
+    pre_crawl_quality_min_score: NotRequired[float]
+    chunk_gate_min_score: NotRequired[float]
+    quality_strict_mode: NotRequired[bool]
+    quality_max_docs: NotRequired[int]
     # Sampling
     max_tokens: NotRequired[int]
     temperature: NotRequired[float]

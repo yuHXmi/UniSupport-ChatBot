@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Advanced search parameters
     const websearchCheckbox = document.getElementById('websearch-checkbox');
     const localdbCheckbox = document.getElementById('localdb-checkbox');
+    const autoSourceCheckbox = document.getElementById('auto-source-checkbox');
+    const qualityGateCheckbox = document.getElementById('quality-gate-checkbox');
+    const chunkGateCheckbox = document.getElementById('chunk-gate-checkbox');
     const maxQueryInput = document.getElementById('max-query');
     const queryScoreThreshold = document.getElementById('query-score-threshold');
     const queryScoreValue = document.getElementById('query-score-value');
@@ -675,6 +678,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const simpleRetrieveModeValue = simpleRetrieveMode.value;
         let usewebsearch = websearchCheckbox.checked;
         let uselocaldb = localdbCheckbox.checked;
+        let autoSource = autoSourceCheckbox ? autoSourceCheckbox.checked : true;
+        let sourceMode = 'auto';
+        const enablePreCrawlQualityGate = qualityGateCheckbox ? qualityGateCheckbox.checked : false;
+        const enableChunkGate = chunkGateCheckbox ? chunkGateCheckbox.checked : false;
+        const enableQualityGate = enablePreCrawlQualityGate || enableChunkGate;
 
         // Validate k_docs value before sending
         let kDocsValue = parseInt(searchDocsCount.value);
@@ -702,6 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (simpleRetrieveModeValue === "basic") {
                 usewebsearch = true;
                 uselocaldb = true;
+                autoSource = true;
                 maxQuery = 1;
                 kPagesValue = 1;
                 kDocsValue = 3;
@@ -713,6 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (simpleRetrieveModeValue == "mid") {
                 usewebsearch = true;
                 uselocaldb = true;
+                autoSource = true;
                 maxQuery = 2;
                 kPagesValue = 3;
                 kDocsValue = 5;
@@ -724,6 +734,7 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (simpleRetrieveModeValue == "advanced") {
                 usewebsearch = true;
                 uselocaldb = true;
+                autoSource = true;
                 maxQuery = 3;
                 kPagesValue = 5;
                 kDocsValue = 5;
@@ -734,6 +745,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             else {
             }
+        }
+
+        if (!retrieveData) {
+            usewebsearch = false;
+            uselocaldb = false;
+            autoSource = false;
+            sourceMode = 'web';
+        } else if (autoSource) {
+            sourceMode = 'auto';
+            usewebsearch = true;
+            uselocaldb = true;
+        } else if (usewebsearch && uselocaldb) {
+            sourceMode = 'hybrid';
+        } else if (uselocaldb) {
+            sourceMode = 'local';
+        } else if (usewebsearch) {
+            sourceMode = 'web';
+        } else {
+            sourceMode = 'auto';
+            autoSource = true;
+            usewebsearch = true;
+            uselocaldb = true;
         }
         
         console.log('Model selected:', selectedModelType, 'Use Gemini:', useGemini);
@@ -775,6 +808,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Advanced search parameters
             use_websearch: usewebsearch,
             use_localdb: uselocaldb,
+            source_mode: sourceMode,
+            auto_source: autoSource,
             max_query: maxQuery,
             query_score_threshold: queryScore,
             engine_type: engineType,
@@ -788,6 +823,11 @@ document.addEventListener('DOMContentLoaded', function() {
             merge_table: mergeTable,
             merge_neighbor: mergeNeighbor,
             llm_rerank: llmrerank,
+            enable_quality_gate: enableQualityGate,
+            enable_pre_crawl_quality_gate: enablePreCrawlQualityGate,
+            enable_chunk_gate: enableChunkGate,
+            quality_log: enableQualityGate,
+            test_trace: enableQualityGate,
         };
         
         // Add time parameters if specified
